@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">نحو الأفضل</string>
+    <string name="title_activity_main">نحو الأفضل</string>
+    <string name="package_name">com.totop.app</string>
+    <string name="custom_url_scheme">com.totop.app</string>
+</resources>

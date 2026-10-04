@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/jpeg" href="/icon.jpg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>نحو الأفضل | To Top</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      function clearAllAndReload() {
+        localStorage.clear();
+        sessionStorage.clear();
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+          });
+        }
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+            window.location.reload(true);
+          });
+        } else {
+          window.location.reload(true);
+        }
+      }
+      window.addEventListener('error', function(e) {
+        document.body.innerHTML = '<div style="padding: 20px; color: #ff6b6b; background: #111; min-height: 100vh; direction: ltr;"><h3>Critical Error</h3><p>' + e.message + '</p><p>File: ' + e.filename + ' Line: ' + e.lineno + '</p><button onclick="clearAllAndReload()" style="padding: 10px; background: #ff6b6b; color: #fff; border: none; border-radius: 5px; margin-top: 20px;">Fix & Reload App</button></div>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        document.body.innerHTML = '<div style="padding: 20px; color: #ff6b6b; background: #111; min-height: 100vh; direction: ltr;"><h3>Unhandled Promise Rejection</h3><p>' + (e.reason && e.reason.message ? e.reason.message : e.reason) + '</p><button onclick="clearAllAndReload()" style="padding: 10px; background: #ff6b6b; color: #fff; border: none; border-radius: 5px; margin-top: 20px;">Fix & Reload App</button></div>';
+      });
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
