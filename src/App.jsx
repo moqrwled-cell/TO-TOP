@@ -14,11 +14,40 @@ import LoginView from './components/LoginView'
 import SupportView from './features/support/SupportView'
 import { useAuth } from './contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { useEffect } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Geolocation } from '@capacitor/geolocation'
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      try {
+        if (Capacitor.isNativePlatform()) {
+          const permNav = await Geolocation.checkPermissions();
+          if (permNav.location !== 'granted') await Geolocation.requestPermissions();
+          
+          const permNotif = await LocalNotifications.checkPermissions();
+          if (permNotif.display !== 'granted') await LocalNotifications.requestPermissions();
+        } else {
+          // Web Fallbacks
+          if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+          }
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(() => {}, () => {});
+          }
+        }
+      } catch (e) {
+        console.warn("Permission request failed", e);
+      }
+    };
+    requestPermissions();
+  }, []);
 
   if (!currentUser) {
     return (

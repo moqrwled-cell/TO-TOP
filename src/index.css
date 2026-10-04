@@ -75,7 +75,7 @@ body {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--surface-border);
-  border-radius: 24px;
+  border-radius: 18px;
   box-shadow: 0 10px 40px var(--shadow-color), inset 0 1px 0 var(--glass-highlight);
   transition: all var(--transition-smooth);
   position: relative;
@@ -108,9 +108,9 @@ body {
   display: inline-block;
 }
 
-h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px; }
-h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
-h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.25rem; }
+h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px; }
+h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.25rem; }
 p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 
 .quote-text {
@@ -133,9 +133,9 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 .app-container { display: flex; height: 100vh; }
 
 .sidebar {
-  width: 320px;
-  margin: 1.5rem;
-  padding: 3rem 2rem;
+  width: 280px;
+  margin: 1rem;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -150,8 +150,8 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 
 .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
 .nav-links li {
-  padding: 1.2rem 1.5rem;
-  border-radius: 16px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
   cursor: pointer;
   color: var(--text-secondary);
   font-weight: 600;
@@ -185,7 +185,7 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
   background: var(--btn-bg);
   color: var(--btn-text);
   border: none;
-  padding: 1.2rem 3rem;
+  padding: 0.9rem 2rem;
   border-radius: 14px;
   font-family: var(--font-ui);
   font-size: 1.2rem;
@@ -203,7 +203,7 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 .input-premium {
   background: var(--surface-color);
   border: 1px solid var(--surface-border);
-  padding: 1.2rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 14px;
   color: var(--text-primary);
   font-family: var(--font-ui);
@@ -242,11 +242,11 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 }
 
 .feature-card {
-  padding: 3rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 280px;
+  min-height: 220px;
   cursor: pointer;
   text-align: center;
   align-items: center;
@@ -329,7 +329,7 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
     background: rgba(5, 5, 5, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 0.6rem 0.2rem calc(0.6rem + env(safe-area-inset-bottom));
+    padding: 0.4rem 0.2rem calc(0.6rem + env(safe-area-inset-bottom));
     border-top: 1px solid rgba(255,255,255,0.05);
     margin: 0;
     z-index: 999999;
@@ -364,7 +364,7 @@ p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
     min-width: 70px;
     white-space: nowrap;
   }
-  .mobile-bottom-nav li svg { margin: 0; width: 24px; height: 24px; }
+  .mobile-bottom-nav li svg { margin: 0; width: 20px; height: 20px; }
   .mobile-bottom-nav li.active {
     background: transparent;
     color: #fff;

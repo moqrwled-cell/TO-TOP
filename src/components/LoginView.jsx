@@ -196,37 +196,7 @@ export default function LoginView() {
           </button>
         </form>
 
-        <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0', color: 'var(--text-muted)' }}>
-          <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
-          <span style={{ padding: '0 1rem', fontSize: '0.9rem' }}>أو</span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
-        </div>
-
-        <button 
-          onClick={handleGoogleAuth}
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '1.2rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.8rem',
-            background: '#fff',
-            color: '#000',
-            border: 'none',
-            borderRadius: '12px',
-            fontSize: '1.1rem',
-            fontWeight: 'bold',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.3s'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-          onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-        >
-          <Globe size={20} color="#ea4335" /> 
-          المتابعة باستخدام جوجل
-        </button>
+        {/* Google button removed for mobile compatibility */}
 
         <div style={{ marginTop: '2rem', color: 'var(--text-secondary)' }}>
           {isLogin ? "ليس لديك حساب؟ " : "لديك حساب بالفعل؟ "}
