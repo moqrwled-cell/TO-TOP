@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, Plus, CheckCircle, Flag, Hourglass, Info, Calendar, CalendarDays, CalendarCheck } from 'lucide-react';
+import { Target, Plus, CheckCircle, Flag, Hourglass, Info, Calendar, CalendarDays, CalendarCheck, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -53,6 +53,12 @@ export default function GoalsView() {
       goals: goals.map(g => g.id === id ? { ...g, progress: 100 } : g)
     });
   }
+  
+  const deleteGoal = (id) => {
+    updateUserData({
+      goals: goals.filter(g => g.id !== id)
+    });
+  };
   
   const filteredGoals = goals.filter(g => g.category === activeTab);
 
@@ -110,6 +116,9 @@ export default function GoalsView() {
                 <h3 style={{ fontSize: '1.6rem', color: goal.progress === 100 ? 'var(--text-muted)' : 'var(--text-primary)', textDecoration: goal.progress === 100 ? 'line-through' : 'none' }}>{goal.title}</h3>
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                   {goal.time && <span style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Info size={16} /> {t('goals.deadline_prefix')} {goal.time}</span>}
+                  <button onClick={() => deleteGoal(goal.id)} className="btn-premium" style={{ padding: '0.6rem', background: 'transparent', color: '#e74c3c', border: '1px solid #e74c3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="حذف الهدف">
+                    <Trash2 size={20} />
+                  </button>
                   {goal.progress < 100 ? (
                     <button onClick={() => completeGoal(goal.id)} className="btn-premium" style={{ padding: '0.6rem 2rem', fontSize: '1.1rem', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none' }}>{t('goals.declare_achievement')}</button>
                   ) : (

@@ -42,7 +42,54 @@ export function AuthProvider({ children }) {
         const userDocRef = doc(db, 'users', user.uid);
         unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
-            setUserData({ ...DEFAULT_USER_DATA, ...docSnap.data() });
+            let data = { ...DEFAULT_USER_DATA, ...docSnap.data() };
+            
+            // --- Auto Reset Logic ---
+            const today = new Date().toDateString();
+            const currentWeek = (() => {
+              const d = new Date();
+              d.setHours(0, 0, 0, 0);
+              d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+              const week1 = new Date(d.getFullYear(), 0, 4);
+              return d.getFullYear() + '-W' + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+            })();
+            const currentMonth = new Date().getFullYear() + '-' + new Date().getMonth();
+
+            let needsUpdate = false;
+            let updatedFields = {};
+
+            if (data.lastDailyReset !== today) {
+              updatedFields.lastDailyReset = today;
+              updatedFields.adhkarCounts = {};
+              if (data.goals && Array.isArray(data.goals)) {
+                updatedFields.goals = data.goals.map(g => g.category === 'daily' ? { ...g, progress: 0 } : g);
+              }
+              needsUpdate = true;
+            }
+
+            if (data.lastWeeklyReset !== currentWeek) {
+              updatedFields.lastWeeklyReset = currentWeek;
+              if (data.goals && Array.isArray(data.goals)) {
+                updatedFields.goals = (updatedFields.goals || data.goals).map(g => g.category === 'weekly' ? { ...g, progress: 0 } : g);
+              }
+              needsUpdate = true;
+            }
+
+            if (data.lastMonthlyReset !== currentMonth) {
+              updatedFields.lastMonthlyReset = currentMonth;
+              if (data.goals && Array.isArray(data.goals)) {
+                updatedFields.goals = (updatedFields.goals || data.goals).map(g => g.category === 'monthly' ? { ...g, progress: 0 } : g);
+              }
+              needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+              data = { ...data, ...updatedFields };
+              setDoc(userDocRef, updatedFields, { merge: true });
+            }
+            // -----------------------
+
+            setUserData(data);
           } else {
             setDoc(userDocRef, DEFAULT_USER_DATA, { merge: true });
             setUserData(DEFAULT_USER_DATA);
