@@ -1,0 +1,154 @@
+--- a/src/services/prayerService.js
++++ b/src/services/prayerService.js
+@@ -83,9 +83,12 @@
+   const lat = coords?.latitude ?? defaultC.latitude;
+   const lng = coords?.longitude ?? defaultC.longitude;
++
++  // Normalized date handling (guards null, undefined, invalid Date)
++  const targetDate = (date instanceof Date && !Number.isNaN(date.getTime())) ? date : new Date();
++
+   const timezone = options.timezone !== undefined
+     ? options.timezone
+-    : (coords?.longitude !== undefined ? Math.round(coords.longitude / 15) : -date.getTimezoneOffset() / 60);
++    : (coords?.longitude !== undefined ? Math.round(coords.longitude / 15) : -targetDate.getTimezoneOffset() / 60);
+ 
+   const methodKey = options.method || 'UmmAlQura';
+   const method = CALCULATION_METHODS[methodKey] || CALCULATION_METHODS.UmmAlQura;
+ 
+-  const y = date.getFullYear();
+-  const m = date.getMonth() + 1;
+-  const d = date.getDate();
++  const y = targetDate.getFullYear();
++  const m = targetDate.getMonth() + 1;
++  const d = targetDate.getDate();
+   const jd = getJulianDate(y, m, d);
+   const sun = getSunPosition(jd);
+@@ -150,5 +153,6 @@
+ export async function fetchAlAdhanTimings(coords, date = new Date()) {
+-  const d = String(date.getDate()).padStart(2, '0');
+-  const m = String(date.getMonth() + 1).padStart(2, '0');
+-  const y = date.getFullYear();
++  const targetDate = (date instanceof Date && !Number.isNaN(date.getTime())) ? date : new Date();
++  const d = String(targetDate.getDate()).padStart(2, '0');
++  const m = String(targetDate.getMonth() + 1).padStart(2, '0');
++  const y = targetDate.getFullYear();
+   const dateStr = `${d}-${m}-${y}`;
+@@ -259,4 +263,18 @@
+ export function getNextPrayer(prayerTimes, currentTime = new Date()) {
++  const refTime = (currentTime instanceof Date && !Number.isNaN(currentTime.getTime())) ? currentTime : new Date();
++
++  // Defensive guard: reject null, undefined, primitives, or invalid prayer objects
++  if (!prayerTimes || typeof prayerTimes !== 'object') {
++    return {
++      key: 'Fajr',
++      name: PRAYER_NAMES.Fajr.ar,
++      englishName: PRAYER_NAMES.Fajr.en,
++      time: '05:00',
++      date: refTime,
++      timeRemainingMs: 0,
++      formattedCountdown: '00:00:00',
++      isTomorrow: false
++    };
++  }
++
+   const prayerKeys = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+   const todayPrayers = [];
+ 
+   for (const key of prayerKeys) {
+-    const timeStr = prayerTimes[key] || prayerTimes[key.toLowerCase()];
+-    if (!timeStr) continue;
+-    const [h, m] = timeStr.split(':').map(Number);
+-    const pDate = new Date(currentTime);
++    const rawTime = prayerTimes[key] || prayerTimes[key.toLowerCase()];
++    if (!rawTime || typeof rawTime !== 'string') continue;
++    const match = rawTime.match(/^(\d{1,2}):(\d{2})$/);
++    if (!match) continue;
++    const h = parseInt(match[1], 10);
++    const m = parseInt(match[2], 10);
++    if (h < 0 || h > 23 || m < 0 || m > 59) continue;
++
++    const pDate = new Date(refTime);
+     pDate.setHours(h, m, 0, 0);
+     todayPrayers.push({
+       key,
+       name: PRAYER_NAMES[key]?.ar || key,
+       englishName: PRAYER_NAMES[key]?.en || key,
+-      time: timeStr,
++      time: rawTime,
+       date: pDate
+     });
+   }
+ 
+   // Find first prayer in the future today
+-  let next = todayPrayers.find((p) => p.date.getTime() > currentTime.getTime());
++  let next = todayPrayers.find((p) => p.date.getTime() > refTime.getTime());
+   let isTomorrow = false;
+ 
+   if (!next) {
+     // All prayers for today have passed -> Tomorrow's Fajr
+-    const fajrTime = prayerTimes.Fajr || prayerTimes.fajr || '05:00';
++    const fajrTime = (typeof prayerTimes.Fajr === 'string' && /^\d{1,2}:\d{2}$/.test(prayerTimes.Fajr))
++      ? prayerTimes.Fajr
++      : ((typeof prayerTimes.fajr === 'string' && /^\d{1,2}:\d{2}$/.test(prayerTimes.fajr))
++          ? prayerTimes.fajr
++          : '05:00');
+     const [h, m] = fajrTime.split(':').map(Number);
+-    const tomorrowFajr = new Date(currentTime);
++    const tomorrowFajr = new Date(refTime);
+     tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
+     tomorrowFajr.setHours(h, m, 0, 0);
+ 
+     next = {
+       key: 'Fajr',
+       name: PRAYER_NAMES.Fajr.ar,
+       englishName: PRAYER_NAMES.Fajr.en,
+       time: fajrTime,
+       date: tomorrowFajr
+     };
+     isTomorrow = true;
+   }
+ 
+-  const diffMs = Math.max(0, next.date.getTime() - currentTime.getTime());
+-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+-  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+-
+-  const formattedCountdown = [
+-    String(hours).padStart(2, '0'),
+-    String(minutes).padStart(2, '0'),
+-    String(seconds).padStart(2, '0')
+-  ].join(':');
++  const diffMs = Math.max(0, next.date.getTime() - refTime.getTime());
++  const countdown = formatCountdown(diffMs);
+ 
+   return {
+     key: next.key,
+     name: next.name,
+     englishName: next.englishName,
+     time: next.time,
+     date: next.date,
+     timeRemainingMs: diffMs,
+-    formattedCountdown,
++    formattedCountdown: countdown.formatted,
+     isTomorrow
+   };
+ }
+@@ -326,5 +344,5 @@
+ export function formatCountdown(ms) {
+-  const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
++  const safeMs = (typeof ms === 'number' && Number.isFinite(ms)) ? Math.max(0, ms) : 0;
++  const totalSeconds = Math.floor(safeMs / 1000);
+   const hours = Math.floor(totalSeconds / 3600);
+   const minutes = Math.floor((totalSeconds % 3600) / 60);
+   const seconds = totalSeconds % 60;
+
+--- a/src/services/notificationService.js
++++ b/src/services/notificationService.js
+@@ -269,4 +269,7 @@
+     const hours = parseInt(match[1], 10);
+     const minutes = parseInt(match[2], 10);
++    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
++      continue;
++    }
+     let target = new Date();
+     target.setHours(hours, minutes, 0, 0);

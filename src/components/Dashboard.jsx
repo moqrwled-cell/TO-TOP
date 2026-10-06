@@ -87,47 +87,47 @@ export default function Dashboard({ setActiveTab }) {
       </div>
 
       {/* Hero / Greeting Section */}
-      <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', position: 'relative', overflow: 'hidden', marginBottom: '2rem', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'linear-gradient(145deg, var(--surface-color), rgba(0,0,0,0.2))' }}>
+      <div className="glass-panel" style={{ padding: '1.75rem', borderRadius: '20px', position: 'relative', overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid var(--card-border)', background: 'linear-gradient(145deg, var(--surface-color), rgba(0,0,0,0.2))' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(77, 168, 218, 0.15) 0%, transparent 70%)', borderRadius: '50%', zIndex: 0 }}></div>
         
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: '2.8rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>{greeting}</h1>
-          <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: '1.6' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '0.4rem', letterSpacing: '-0.5px' }}>{greeting}</h1>
+          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: '1.6' }}>
             {t('dashboard.welcome_msg', 'النجاح ليس صدفة، بل هو تراكم لعادات صغيرة تقوم بها كل يوم. دعنا نبدأ ببناء يوم عظيم!')}
           </p>
         </div>
       </div>
 
       {/* Statistics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
         
-        <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '18px', display: 'flex', alignItems: 'center', gap: '1rem', borderLeft: '4px solid #ffd700' }}>
-          <div style={{ background: 'rgba(255, 215, 0, 0.1)', padding: '1rem', borderRadius: '14px' }}>
-            <Coins size={28} color="#ffd700" />
+        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '0.85rem', borderInlineStart: '4px solid #ffd700' }}>
+          <div style={{ background: 'rgba(255, 215, 0, 0.12)', padding: '0.85rem', borderRadius: '12px' }}>
+            <Coins size={24} color="#ffd700" />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>{t('dashboard.focus_points', 'نقاط التركيز')}</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.points}</div>
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.15rem' }}>{t('dashboard.focus_points', 'نقاط التركيز')}</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.points}</div>
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '18px', display: 'flex', alignItems: 'center', gap: '1rem', borderLeft: '4px solid #ff6b6b' }}>
-          <div style={{ background: 'rgba(255, 107, 107, 0.1)', padding: '1rem', borderRadius: '14px' }}>
-            <Flame size={28} color="#ff6b6b" />
+        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '0.85rem', borderInlineStart: '4px solid #ff6b6b' }}>
+          <div style={{ background: 'rgba(255, 107, 107, 0.12)', padding: '0.85rem', borderRadius: '12px' }}>
+            <Flame size={24} color="#ff6b6b" />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>{t('dashboard.streak', 'أيام الاستمرار')}</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.streak} <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>أيام</span></div>
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.15rem' }}>{t('dashboard.streak', 'أيام الاستمرار')}</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.streak} <span style={{ fontSize: '0.82rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>أيام</span></div>
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '18px', display: 'flex', alignItems: 'center', gap: '1rem', borderLeft: '4px solid #4caf50' }}>
-          <div style={{ background: 'rgba(76, 175, 80, 0.1)', padding: '1rem', borderRadius: '14px' }}>
-            <Trophy size={28} color="#4caf50" />
+        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '0.85rem', borderInlineStart: '4px solid #10b981' }}>
+          <div style={{ background: 'rgba(16, 185, 129, 0.12)', padding: '0.85rem', borderRadius: '12px' }}>
+            <Trophy size={24} color="#10b981" />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>{t('dashboard.completed_tasks', 'المهام المنجزة')}</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.completedTasks} / {stats.totalTasks}</div>
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.15rem' }}>{t('dashboard.completed_tasks', 'المهام المنجزة')}</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{stats.completedTasks} / {stats.totalTasks}</div>
           </div>
         </div>
 
@@ -141,28 +141,28 @@ export default function Dashboard({ setActiveTab }) {
       </div>
       
       <div className="cards-grid delay-1 animate-fade-up">
-        <div className="feature-card glass-panel" onClick={() => setActiveTab('worship')} style={{ padding: '2rem', borderRadius: '20px', borderTop: '4px solid #4da8da', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
-          <div className="icon-wrapper" style={{ background: 'rgba(77, 168, 218, 0.1)', padding: '1.2rem', borderRadius: '16px', marginBottom: '1.5rem' }}>
-            <Compass size={32} color="#4da8da" />
+        <div className="feature-card glass-panel" onClick={() => setActiveTab('worship')} style={{ padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #4da8da', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
+          <div className="icon-wrapper" style={{ background: 'rgba(77, 168, 218, 0.12)', padding: '1rem', borderRadius: '14px', marginBottom: '1rem' }}>
+            <Compass size={26} color="#4da8da" />
           </div>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>{t('nav.worship', 'العبادة')}</h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', margin: 0 }}>{t('dashboard.desc_worship', 'القرآن، الأذكار، والصلاة. غذّي روحك لتنطلق بقوة وطمأنينة.')}</p>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', marginBottom: '0.35rem' }}>{t('nav.worship', 'العبادة')}</h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>{t('dashboard.desc_worship', 'القرآن، الأذكار، والصلاة. غذّي روحك لتنطلق بقوة وطمأنينة.')}</p>
         </div>
         
-        <div className="feature-card glass-panel" onClick={() => setActiveTab('organizer')} style={{ padding: '2rem', borderRadius: '20px', borderTop: '4px solid #f39c12', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
-          <div className="icon-wrapper" style={{ background: 'rgba(243, 156, 18, 0.1)', padding: '1.2rem', borderRadius: '16px', marginBottom: '1.5rem' }}>
-            <Clock size={32} color="#f39c12" />
+        <div className="feature-card glass-panel" onClick={() => setActiveTab('organizer')} style={{ padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #f39c12', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
+          <div className="icon-wrapper" style={{ background: 'rgba(243, 156, 18, 0.12)', padding: '1rem', borderRadius: '14px', marginBottom: '1rem' }}>
+            <Clock size={26} color="#f39c12" />
           </div>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>{t('nav.organizer', 'تنظيم اليوم')}</h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', margin: 0 }}>{t('dashboard.desc_organizer', 'برمج مهامك، سيطر على وقتك، ونظم أولوياتك اليومية بذكاء.')}</p>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', marginBottom: '0.35rem' }}>{t('nav.organizer', 'تنظيم اليوم')}</h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>{t('dashboard.desc_organizer', 'برمج مهامك، سيطر على وقتك، ونظم أولوياتك اليومية بذكاء.')}</p>
         </div>
         
-        <div className="feature-card glass-panel" onClick={() => setActiveTab('goals')} style={{ padding: '2rem', borderRadius: '20px', borderTop: '4px solid #e91e63', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
-          <div className="icon-wrapper" style={{ background: 'rgba(233, 30, 99, 0.1)', padding: '1.2rem', borderRadius: '16px', marginBottom: '1.5rem' }}>
-            <Target size={32} color="#e91e63" />
+        <div className="feature-card glass-panel" onClick={() => setActiveTab('goals')} style={{ padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #e91e63', cursor: 'pointer', textAlign: 'right', alignItems: 'flex-start' }}>
+          <div className="icon-wrapper" style={{ background: 'rgba(233, 30, 99, 0.12)', padding: '1rem', borderRadius: '14px', marginBottom: '1rem' }}>
+            <Target size={26} color="#e91e63" />
           </div>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>{t('nav.goals', 'الأهداف')}</h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', margin: 0 }}>{t('dashboard.desc_goals', 'ضع رؤيتك الواضحة للمستقبل وتتبع إنجازاتك الكبرى خطوة بخطوة.')}</p>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', marginBottom: '0.35rem' }}>{t('nav.goals', 'الأهداف')}</h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>{t('dashboard.desc_goals', 'ضع رؤيتك الواضحة للمستقبل وتتبع إنجازاتك الكبرى خطوة بخطوة.')}</p>
         </div>
       </div>
       

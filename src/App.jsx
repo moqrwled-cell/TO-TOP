@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { LayoutDashboard, Compass, Target, Clock, BookOpen, BookMarked, TreePine, LogOut, MessageSquare, Settings } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { LayoutDashboard, Compass, Target, Clock, BookOpen, BookMarked, TreePine, LogOut, MessageSquare, Settings, MoreHorizontal } from 'lucide-react'
 import './index.css'
 import WorshipView from './features/worship/WorshipView'
 import GoalsView from './features/goals/GoalsView'
@@ -10,43 +10,64 @@ import WisdomView from './features/wisdom/WisdomView'
 import PomodoroView from './features/pomodoro/PomodoroView'
 import SettingsView from './features/settings/SettingsView'
 import MessageModal from './components/MessageModal'
+import MoreModal from './components/MoreModal'
 import LoginView from './components/LoginView'
 import SupportView from './features/support/SupportView'
 import { useAuth } from './contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
-import { useEffect } from 'react'
-import { Capacitor } from '@capacitor/core'
-import { Geolocation } from '@capacitor/geolocation'
-import { LocalNotifications } from '@capacitor/local-notifications'
+import {
+  requestNotificationPermission,
+  initializeNotificationChannels,
+  schedulePrayerNotifications
+} from './services/notificationService'
+import { getCurrentLocation } from './services/locationService'
+import { getPrayerTimes } from './services/prayerService'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
 
+  // Centralized, non-blocking startup permissions flow with graceful fallbacks
   useEffect(() => {
-    const requestPermissions = async () => {
+    let isMounted = true;
+
+    const initStartupPermissions = async () => {
       try {
-        if (Capacitor.isNativePlatform()) {
-          const permNav = await Geolocation.checkPermissions();
-          if (permNav.location !== 'granted') await Geolocation.requestPermissions();
-          
-          const permNotif = await LocalNotifications.checkPermissions();
-          if (permNotif.display !== 'granted') await LocalNotifications.requestPermissions();
-        } else {
-          // Web Fallbacks
-          if ("Notification" in window && Notification.permission === "default") {
-            Notification.requestPermission();
+        // 1. Initialize Android notification channels (safe across native and web)
+        await initializeNotificationChannels().catch(err => {
+          console.warn('[App] Notification channels init warning:', err?.message || err);
+        });
+
+        // 2. Request permissions in parallel (non-blocking, never halts UI)
+        await Promise.allSettled([
+          requestNotificationPermission(),
+          getCurrentLocation({ timeout: 6000 })
+        ]);
+
+        if (!isMounted) return;
+
+        // 3. Pre-schedule today's 5 prayers in background using resolved location or canonical Makkah fallback
+        try {
+          const prayerData = await getPrayerTimes();
+          if (prayerData?.timings) {
+            await schedulePrayerNotifications(prayerData.timings, prayerData.location);
           }
-          if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(() => {}, () => {});
-          }
+        } catch (prayerErr) {
+          console.info('[App] Background prayer schedule warning:', prayerErr?.message || prayerErr);
         }
-      } catch (e) {
-        console.warn("Permission request failed", e);
+      } catch (err) {
+        // Absolute fallback: app remains 100% functional, zero modal lockups
+        console.warn('[App] Startup flow completed with fallback:', err?.message || err);
       }
     };
-    requestPermissions();
+
+    initStartupPermissions();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!currentUser) {
@@ -65,7 +86,7 @@ function App() {
       <>
         <div className="bg-animation"></div>
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-          <div className="glass-panel animate-fade-up" style={{ padding: '3rem', textAlign: 'center', maxWidth: '500px' }}>
+          <div className="glass-panel animate-fade-up" style={{ padding: '1.5rem', textAlign: 'center', maxWidth: '500px' }}>
             <h2 className="text-gradient" style={{ fontSize: '2rem', marginBottom: '1rem' }}>تأكيد البريد الإلكتروني</h2>
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', fontSize: '1.2rem', marginBottom: '2rem' }}>
               لقد أرسلنا رابط تفعيل إلى بريدك الإلكتروني ({currentUser.email}). 
@@ -134,7 +155,7 @@ function App() {
         </nav>
         
         <main className="main-content">
-          <div className="glass-panel main-glass-panel" style={{ minHeight: '100%', padding: '3rem', display: 'flex', flexDirection: 'column' }}>
+          <div className="glass-panel main-glass-panel" style={{ minHeight: '100%', padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
             {activeTab === 'dashboard' && <Dashboard setActiveTab={setActiveTab} />}
             {activeTab === 'worship' && <WorshipView />}
             {activeTab === 'goals' && <GoalsView />}
@@ -148,12 +169,38 @@ function App() {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation (Ergonomic 5-Tab Bar) */}
       <nav className="mobile-bottom-nav">
         <ul>
-          <NavItems />
+          <li className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>
+            <LayoutDashboard size={20} /> <span>{t('nav.dashboard', 'الرئيسية')}</span>
+          </li>
+          <li className={activeTab === 'worship' ? 'active' : ''} onClick={() => setActiveTab('worship')}>
+            <Compass size={20} /> <span>{t('nav.worship', 'العبادات')}</span>
+          </li>
+          <li className={activeTab === 'organizer' ? 'active' : ''} onClick={() => setActiveTab('organizer')}>
+            <Clock size={20} /> <span>{t('nav.organizer', 'المنظم')}</span>
+          </li>
+          <li className={activeTab === 'goals' ? 'active' : ''} onClick={() => setActiveTab('goals')}>
+            <Target size={20} /> <span>{t('nav.goals', 'الإنجاز')}</span>
+          </li>
+          <li
+            className={['pomodoro', 'thoughts', 'wisdom', 'support', 'settings'].includes(activeTab) || isMoreOpen ? 'active' : ''}
+            onClick={() => setIsMoreOpen(true)}
+          >
+            <MoreHorizontal size={20} /> <span>{t('nav.more', 'المزيد')}</span>
+          </li>
         </ul>
       </nav>
+
+      {/* More Modal / Secondary Drawer */}
+      <MoreModal
+        isOpen={isMoreOpen}
+        onClose={() => setIsMoreOpen(false)}
+        activeTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        onLogout={logout}
+      />
     </>
   )
 }

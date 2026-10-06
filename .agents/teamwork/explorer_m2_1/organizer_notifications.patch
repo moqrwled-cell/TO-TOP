@@ -1,0 +1,113 @@
+--- a/src/features/organizer/OrganizerView.jsx
++++ b/src/features/organizer/OrganizerView.jsx
+@@ -4,6 +4,11 @@
+ import { useAuth } from '../../contexts/AuthContext';
+ import { useTranslation } from 'react-i18next';
++import {
++  scheduleTaskNotification,
++  cancelTaskNotification,
++  requestNotificationPermission
++} from '../../services/notificationService';
+ 
+ export default function OrganizerView() {
+   const { t } = useTranslation();
+@@ -21,6 +26,13 @@
+   const [newRoutine, setNewRoutine] = useState('');
+   const [newRoutineTime, setNewRoutineTime] = useState('');
+ 
++  // Request notification permission across native Capacitor & Web on mount
++  useEffect(() => {
++    requestNotificationPermission().catch(err => {
++      console.warn('[OrganizerView] Error requesting notification permissions:', err);
++    });
++  }, []);
++
+   // Notification logic for routine
+   useEffect(() => {
+     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+@@ -60,9 +72,21 @@
+-  const addTask = () => {
+-    if (newTask.trim() && newTime) {
+-      updateUserData({
+-        tasks: [...tasks, { id: Date.now(), text: newTask, time: newTime, isImportant, isCompleted: false, category: newCategory }].sort((a, b) => a.time.localeCompare(b.time))
+-      });
+-      setNewTask('');
+-      setNewTime('');
+-      setIsImportant(false);
+-    }
+-  };
++  const addTask = async () => {
++    if (newTask.trim() && newTime) {
++      const taskItem = {
++        id: Date.now(),
++        text: newTask.trim(),
++        time: newTime,
++        date: new Date().toISOString().split('T')[0],
++        isImportant,
++        isCompleted: false,
++        category: newCategory
++      };
++
++      try {
++        await scheduleTaskNotification(taskItem);
++      } catch (err) {
++        console.warn('[OrganizerView] Error scheduling task notification:', err);
++      }
++
++      updateUserData({
++        tasks: [...tasks, taskItem].sort((a, b) => a.time.localeCompare(b.time))
++      });
++      setNewTask('');
++      setNewTime('');
++      setIsImportant(false);
++    }
++  };
+@@ -81,9 +105,37 @@
+-  const removeTask = (id) => updateUserData({ tasks: tasks.filter(t => t.id !== id) });
++  const removeTask = async (id) => {
++    try {
++      await cancelTaskNotification(id);
++    } catch (err) {
++      console.warn('[OrganizerView] Error cancelling task notification:', err);
++    }
++    updateUserData({ tasks: tasks.filter(t => t.id !== id) });
++  };
+   const removeRoutine = (id) => updateUserData({ routines: routine.filter(r => r.id !== id) });
+ 
+-  const toggleTaskCompletion = (id) => {
+-    updateUserData({
+-      tasks: tasks.map(t => t.id === id ? { ...t, isCompleted: !t.isCompleted } : t)
+-    });
+-  };
++  const toggleTaskCompletion = async (id) => {
++    const targetTask = tasks.find(t => t.id === id);
++    if (!targetTask) return;
++
++    const willBeCompleted = !targetTask.isCompleted;
++
++    if (willBeCompleted) {
++      try {
++        await cancelTaskNotification(id);
++      } catch (err) {
++        console.warn('[OrganizerView] Error cancelling task notification on completion:', err);
++      }
++    } else {
++      if (targetTask.time) {
++        try {
++          await scheduleTaskNotification({
++            ...targetTask,
++            date: targetTask.date || new Date().toISOString().split('T')[0]
++          });
++        } catch (err) {
++          console.warn('[OrganizerView] Error rescheduling task notification on reactivation:', err);
++        }
++      }
++    }
++
++    updateUserData({
++      tasks: tasks.map(t => t.id === id ? { ...t, isCompleted: willBeCompleted } : t)
++    });
++  };
+@@ -222,3 +274,3 @@
+-                        {task.isImportant && <Star size={18} style={{ display: 'inline', marginRight: '0.5rem' }} />}
++                        {task.isImportant && <Star size={18} style={{ display: 'inline', marginInlineEnd: '0.5rem' }} />}
